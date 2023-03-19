@@ -1,0 +1,60 @@
+﻿@inject IAdminService AdminService
+
+<div class="d-flex justify-content-center">
+    <form class="d-flex justify-content-center mb-5 border border-1 border-secondary w-25 p-2">
+        <EditForm Model="Model" OnValidSubmit="@OnFormSubmit">
+            <DataAnnotationsValidator />
+            <h4>@Page Genre</h4>
+            <div>
+                @if (Page.Equals(PageType.Delete))
+                {
+                    <InputText id="title" class="form-control mb-1" @bind-Value="Model.Name" disabled placeholder="Name"></InputText>
+                }
+                else
+                {
+                    <InputText id="title" class="form-control mb-1" @bind-Value="Model.Name" placeholder="Name"></InputText>
+                }
+            </div>
+            <ValidationMessage For="@(() => Model.Name)" />            
+            
+            <div>
+                <button type="submit" class="btn btn-@(Page.Equals(PageType.Delete)? "danger" : "primary") rounded-0 mb-1">@Page Genre</button>
+            </div>
+        </EditForm>
+    </form>
+</div>
+
+@code {
+	[Parameter] public GenreDTO Model { get; set; } = new();
+	[Parameter] public string Page { get; set; } = string.Empty;
+	[Parameter] public EventCallback<string> OnChanged { get; set; }
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		// Directors = await AdminService.GetAsync<DirectorDTO>("directors");
+	}
+
+
+    private async Task OnFormSubmit()
+    {
+        try
+        {
+            if (Page.Equals(PageType.Create))
+                await AdminService.CreateAsync<GenreCreateDTO>("directors", new GenreCreateDTO
+					{
+						Name = Model.Name
+					});
+            else if (Page.Equals(PageType.Edit))
+                await AdminService.EditAsync<GenreDTO>($"genres/{Model.Id}", Model);
+            else if (Page.Equals(PageType.Delete))
+                await AdminService.DeleteAsync<GenreDTO>($"genres/{Model.Id}");
+
+            await OnChanged.InvokeAsync("");
+        }
+        catch
+        {
+            await OnChanged.InvokeAsync("Couldn't create/edit/delete the genre.");
+        }
+    }
+}

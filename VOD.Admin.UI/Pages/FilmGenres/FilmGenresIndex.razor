@@ -1,0 +1,30 @@
+﻿<table class="table mt-2">
+    <thead>
+        <tr>
+            <th scope="col">FilmId</th>
+			<th scope="col">GenreId</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.FilmId</td>
+                <td>@item.GenreId</td>
+                <td>
+                    <div class="d-flex me-1 justify-content-end">
+                        <button type="button" class="btn btn-outline-danger rounded-0 me-1" @onclick="@( async () => await OnClick.InvokeAsync(
+                        new RefClickModel<FilmGenreDTO>(PageType.Delete, item)))">
+                        Delete
+                    </button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+	[Parameter] public List<FilmGenreDTO> Model { get; set; } = new();
+	[Parameter] public EventCallback<RefClickModel<FilmGenreDTO>> OnClick { get; set; }
+}
